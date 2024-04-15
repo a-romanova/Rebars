@@ -1,0 +1,92 @@
+﻿<Window x:Class="RebarsOutOfHosts.TableControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RebarsOutOfHosts"
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             mc:Ignorable="d"
+        Topmost="True"
+        
+        SizeToContent="WidthAndHeight"
+        Title="Арматура вне основы">
+    <Window.Resources>
+        <CollectionViewSource x:Key="FailedElementsList" Source="{Binding FailedElements, Mode=OneWay}" >
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="SelectedParameterValue"/>
+            </CollectionViewSource.GroupDescriptions>
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="SelectedParameterValue"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+        
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="auto"/>
+            
+        </Grid.RowDefinitions>
+        <local:CustomDataGrid
+            IsReadOnly="True"
+            SelectionMode = "Extended"
+            SelectionUnit="FullRow"
+            SelectedItemsList="{Binding Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            ItemsSource="{Binding Source= {StaticResource FailedElementsList}}"
+            AutoGenerateColumns="False"
+            >
+            <DataGrid.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type GroupItem}">
+                                        <Expander IsExpanded="True" Background="LightGray">
+                                            <Expander.Header>
+                                                <TextBlock FontWeight="Bold" Text="{Binding Path=Name}" Margin="5,0,0,0" />
+                                            </Expander.Header>
+                                            <Expander.Content>
+                                                <ItemsPresenter />
+                                            </Expander.Content>
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </DataGrid.GroupStyle>
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem 
+                        Header="3D-вид"
+                        Command="{Binding CreateView}"
+                        />
+                    <MenuItem 
+                        Header="Копировать id арматурного элемента"
+                        Command="{Binding CopyElementId}"
+                        />
+                    <MenuItem 
+                        Header="Копировать id основы"
+                        Command="{Binding CopyHostId}"
+                        />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="id арматурного элемента" Binding="{Binding ElementId}"/>
+                <DataGridTextColumn Header="Имя арматурного элемента" Binding="{Binding ElementName}" />
+                <DataGridTextColumn Header="id элемента основы" Binding="{Binding HostId}" />
+                <DataGridTextColumn Header="Имя элемента основы" Binding="{Binding HostName}" />
+                <DataGridTextColumn Header="Категория элемента основы" Binding="{Binding HostCategory}" />
+            </DataGrid.Columns>
+        </local:CustomDataGrid>
+        <WrapPanel Grid.Row="1">
+            <Button Content="3D вид по всем" Margin="10" Command="{Binding CreateViewForAll}"/>
+            <Button Content="Обновить" Margin="10" Command="{Binding Refresh}"/>
+            <Button Content="Экспорт" Margin="10" Command="{Binding Export}"/>
+            <ComboBox Margin="10"   ItemsSource="{Binding ParameterNames}" SelectedValue="{Binding SelectedParameter, Mode=TwoWay}" IsEditable="True" MinWidth="300"/>
+        </WrapPanel>
+            
+    </Grid>
+</Window>
